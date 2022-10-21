@@ -8,13 +8,16 @@ from rest_framework import status
 
 
 @api_view(["GET", "POST"])
-def dummy(request):
+def index(request):
     # request should be an HTTP request
     # which may contain several fields
     # right now is just sentence(str) and method(str)
+    # print("11111111", request)
     if request.method == "POST":
-        sentence = request.sentence  # TODO: serializer
-        method = request.method
+        # print(request.data)
+        sentence = request.data.get("sentence", "happy")
+        method = request.data.get("method", "lstm")
+        print(sentence, method)
         if method == "lstm":
             res = predict_text(sentence)
         elif method == "bert":

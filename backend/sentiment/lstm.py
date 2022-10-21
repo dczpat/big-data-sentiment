@@ -101,11 +101,13 @@ def predict_text(text):
     model = SentimentRNN(
         no_layers, vocab_size, output_dim, hidden_dim, embedding_dim, drop_prob=0.5
     )
-    model.load_state_dict(torch.load("state_dict_model.pt", map_location=device))
+    model.load_state_dict(
+        torch.load("./sentiment/state_dict_model.pt", map_location=device)
+    )
 
     model.to(device)
 
-    a_file = open("vocab.pkl", "rb")
+    a_file = open("./sentiment/vocab.pkl", "rb")
     vocab = pickle.load(a_file)
 
     word_seq = np.array(

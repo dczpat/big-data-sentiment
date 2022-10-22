@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+	<script type="text/javascript">
+		function fileSubmit(){
+		var arry = $("#form1").serializeArray();
+        var obj = {};
+        for (var i = 0; i < arry.length; i++) {
+            obj[arry[i].name] = arry[i].value;
+        }
+        $.ajax({
+            url: "http://127.0.0.1:8000/sentiment/",
+            data: obj,
+            type: "post",
+            success: function (data) {
+                alert("success");
+            }
+        })
+		}
+		document.getElementById("res").innerHTML = request.getParameter("result")
+	</script>
+
+<head>
+    <meta charset="UTF-8">
+    <title>tool for sentimental analysis</title>
+</head>
+<body>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+	<center>
+    <h1><font color="3366cc">tool for sentimental analysis</font></h1>
+	<br>
+	<form name ="form1" method="post" onsubmit="return fileSubmit()">
+		<textarea name="content" rows="8" cols="40">
+Input the sentence or paragraph to be analyzed
+		</textarea>
+		<br>
+		<br>
+		<select name = "model">
+		<option value = "XGBOOST">XGBOOST</option>
+		<option value = "LSTM">LSTM</option>
+		<option value = "BERT">BERT</option>
+		</select>
+		<input type = "submit" name = "button" value = "submit">
+	</form>
+	<div id="res"></div>
+	</center>
+</body>
+</html>

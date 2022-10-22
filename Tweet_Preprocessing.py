@@ -3,7 +3,7 @@ import numpy as np
 import re
 from nltk.corpus import stopwords
 
-file = 'C:/Users/NTW/Downloads/CS5344 Big-Data Analytics Technology/Project/keyword_tweets_UkraineRussianWar_70k_rows.csv'
+file = 'C:/Users/NTW/Downloads/CS5344 Big-Data Analytics Technology/Project/keyword_tweets_OpIran.csv'
 
 data = pd.read_csv(file)
 
@@ -31,8 +31,8 @@ def clean_tweet(tweet):
 
 #tweet_column = pd.DataFrame(data['Tweet'])
 #tweet_column = clean_tweet(tweet_column)
-data['Tweet'] = data['Tweet'].apply(lambda x: clean_tweet(x))
+data['Tweet_Clean'] = data['Tweet'].apply(lambda x: clean_tweet(x))
 
 print(data.head())
 
-data.to_csv('C:/Users/NTW/Downloads/CS5344 Big-Data Analytics Technology/Project/keyword_tweets_UkraineRussianWar_70k_rows_clean.csv')
+data.to_csv('C:/Users/NTW/Downloads/CS5344 Big-Data Analytics Technology/Project/keyword_tweets_OpIran_clean.csv')

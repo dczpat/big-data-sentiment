@@ -18,16 +18,16 @@
 	<center>
     <h1><font color="3366cc">tool for sentimental analysis</font></h1>
 	<br>
-	<form method="post">
-		<textarea name="content" rows="8" cols="40">
+	<form method="post" action="http://127.0.0.1:8000/sentiment/">
+		<textarea name="sentence" rows="8" cols="40">
 Input the sentence or paragraph to be analyzed
 		</textarea>
 		<br>
 		<br>
-		<select name = "model">
-		<option value = "XGBOOST">XGBOOST</option>
-		<option value = "LSTM">LSTM</option>
-		<option value = "BERT">BERT</option>
+		<select name = "method">
+		<option value = "xgboost">XGBOOST</option>
+		<option value = "lstm">LSTM</option>
+		<option value = "bert">BERT</option>
 		</select>
 		<input type = "submit" name = "button" value = "submit">
 	</form>

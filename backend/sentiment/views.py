@@ -13,13 +13,15 @@ def index(request):
     # which may contain several fields
     # right now is just sentence(str) and method(str)
     # print("11111111", request)
-    if request.method == "POST":
-        # print(request.data)
+    if request.method == "POST":  # or request.method == "OPTIONS":
+        # print(dict(request.POST))
+        print(request.data)
         sentence = request.data.get("sentence", "happy")
         method = request.data.get("method", "lstm")
         print(sentence, method)
-        if method == "lstm":
+        if method == "lstm" or method == "LSTM":
             res = predict_text(sentence)
+            print(res)
         elif method == "bert":
             # res=func(sentence)
             pass

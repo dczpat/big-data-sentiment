@@ -34,7 +34,7 @@ tqdm_notebook.pandas()
 # file = open("/Users/zhaoxinzhu/Desktop/test_group.txt",encoding="utf-16")
 
 
-def xgboost_evaluate(file):
+def xgboost_evaluate(filename):
     model = XGBClassifier(
         max_depth=4,
         learning_rate=0.15,
@@ -58,7 +58,7 @@ def xgboost_evaluate(file):
         seed=None,
         missing=None,
     )
-
+    file = open(filename, encoding="utf-8")
     input = file.readlines()
     stemmer = LancasterStemmer()
     test_corpus = []
@@ -74,27 +74,28 @@ def xgboost_evaluate(file):
         test_corpus.append(j)
     mid = pd.DataFrame(test_corpus)
     mid.columns = ["text"]
-    feature_path = "./feature.pkl"
+    feature_path = "./sentiment/xgboost/feature.pkl"
     loaded_vec = CountVectorizer(
         decode_error="replace", vocabulary=pickle.load(open(feature_path, "rb"))
     )
     # 加载TfidfTransformer
-    tfidftransformer_path = "/Users/zhaoxinzhu/Desktop/tfidftransformer.pkl"
+    tfidftransformer_path = "./sentiment/xgboost/tfidftransformer.pkl"
     tfidftransformer = pickle.load(open(tfidftransformer_path, "rb"))
     # 测试用transform，表示测试数据，为list
     test_tfidf = tfidftransformer.transform(loaded_vec.transform(mid["text"]))
     clf = XGBClassifier()
     booster = xgb.Booster()
-    booster.load_model("./xgboost_classifier_model.model")
+    booster.load_model("./sentiment/xgboost/xgboost_classifier_model.model")
     clf._Booster = booster
     clf._le = LabelEncoder().fit([1, 0])
     y_mid = clf.predict(test_tfidf, validate_features=False)
-    f = open("./ans.txt", "w")
+    f = open("./sentiment/xgboost/ans.txt", "w")
     for i, line in enumerate(input):
         f.write(line + "\x20" + "\x20")
         status = "positive" if y_mid[i] == 1 else "negative"
         f.write(status + "\n")
     f.close()
+    return "./sentiment/xgboost/ans.txt"
 
 
 # xgboost_evaluate(file)
@@ -119,18 +120,18 @@ def xgboost_evaluate_single(sentence):
     mid.columns = ["text"]
     # tf_idf = TfidfVectorizer()
     # mid_ = tf_idf.fit_transform(mid['text'])
-    feature_path = "./feature.pkl"
+    feature_path = "./sentiment/xgboost/feature.pkl"
     loaded_vec = CountVectorizer(
         decode_error="replace", vocabulary=pickle.load(open(feature_path, "rb"))
     )
     # 加载TfidfTransformer
-    tfidftransformer_path = "./tfidftransformer.pkl"
+    tfidftransformer_path = "./sentiment/xgboost/tfidftransformer.pkl"
     tfidftransformer = pickle.load(open(tfidftransformer_path, "rb"))
     # 测试用transform，表示测试数据，为list
     test_tfidf = tfidftransformer.transform(loaded_vec.transform(mid["text"]))
     clf = XGBClassifier()
     booster = xgb.Booster()
-    booster.load_model("./xgboost_classifier_model.model")
+    booster.load_model("./sentiment/xgboost/xgboost_classifier_model.model")
     # cols_when_model_builds = booster.feature_names
     clf._Booster = booster
     clf._le = LabelEncoder().fit([1, 0])

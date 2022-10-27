@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sun Oct 16 00:06:25 2022
+Created on Sat Oct 22 16:56:48 2022
 
 @author: zhusisi
 """
+
 import sys
 import pandas as pd
 import numpy as np
@@ -12,6 +13,8 @@ import torch
 import torch.nn as nn
 import re
 import pickle
+from torch.utils.data import TensorDataset, DataLoader
+
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -92,7 +95,13 @@ def padding_(sentences, seq_len):
     return features
 
 
-def predict_text(text):
+def get_key(val, dic):
+    for key, value in dic.items():
+        if val == value:
+            return key
+
+
+def predict_text(file_name):
     no_layers = 2
     vocab_size = 1000 + 1  # extra 1 for padding
     embedding_dim = 64
@@ -102,33 +111,40 @@ def predict_text(text):
         no_layers, vocab_size, output_dim, hidden_dim, embedding_dim, drop_prob=0.5
     )
     model.load_state_dict(
-        torch.load("./sentiment/state_dict_model.pt", map_location=device)
+        torch.load("./sentiment/lstm/state_dict_model.pt", map_location=device)
     )
-
     model.to(device)
-
-    a_file = open("./sentiment/vocab.pkl", "rb")
+    a_file = open("./sentiment/lstm/vocab.pkl", "rb")
     vocab = pickle.load(a_file)
-
-    word_seq = np.array(
-        [
-            vocab[preprocess_string(word)]
-            for word in text.split()
-            if preprocess_string(word) in vocab.keys()
-        ]
-    )
-    word_seq = np.expand_dims(word_seq, axis=0)
-    pad = torch.from_numpy(padding_(word_seq, 500))
-    inputs = pad.to(device)
+    df = pd.read_csv(file_name, index_col=0)
+    data_val = df["Tweet_Clean"].values
+    input_list = []
+    for sent in data_val:
+        input_list.append(
+            [
+                vocab[preprocess_string(word)]
+                for word in str(sent).lower().split()
+                if preprocess_string(word) in vocab.keys()
+            ]
+        )
+    input_arr = np.array(input_list)
+    input_list_pad = padding_(input_arr, 27)
+    input_data = TensorDataset(torch.from_numpy(input_list_pad))
     batch_size = 1
-    h = model.init_hidden(batch_size)
-    h = tuple([each.data for each in h])
-    output, h = model(inputs, h)
-    prob = output.item()
-    status = "positive" if prob > 0.5 else "negative"
-    return status
-
-
-if __name__ == "__main__":
-    for _ in range(100):
-        print(predict_text("Have a good day!"))
+    input_loader = DataLoader(input_data, shuffle=False, batch_size=batch_size)
+    prob_list = []
+    result_list = []
+    input_h = model.init_hidden(batch_size)
+    for inputs in input_loader:
+        input = inputs[0].to(device)
+        input_h = tuple([each.data for each in input_h])
+        output, result = model(input, input_h)
+        prob_list.append(output.item())
+        result = 1 if output.item() > 0.5 else 0
+        result_list.append(result)
+    result_df = pd.DataFrame(
+        list(zip(prob_list, result_list)), columns=["prob", "result"]
+    )
+    output_df = pd.concat([df, result_df], axis=1)
+    output_df.to_csv(file_name + " Outcome.csv")
+    return output_df

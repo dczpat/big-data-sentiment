@@ -1,1 +1,2 @@
 /corpus/training.1600000.processed.noemoticon.csv
+/backend/sentiment/bert/best_model_state.bin

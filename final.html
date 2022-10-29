@@ -5,6 +5,11 @@
     <title>tool for sentimental analysis</title>
 </head>
 <body>
+	<script>
+		//var r = Response.getParameter("res")
+		//console.log(r)
+	//document.getElementById("res").innerHTML = Response.getParameter("res")
+	</script>
 	<br>
 	<br>
 	<br>
@@ -14,26 +19,27 @@
 	<center>
     <h1><font color="3366cc">tool for sentimental analysis</font></h1>
 	<br>
-	<form name ="form1"  method="post">
+	<form name ="form1" id = "sentence" method="post">
 		<textarea name="sentence" rows="8" cols="40">
 Input the sentence or paragraph to be analyzed
 		</textarea>
 		<br>
 		<br>
 		<select name = "method">
-		<option value = "XGBOOST">XGBOOST</option>
-		<option value = "LSTM">LSTM</option>
-		<option value = "BERT">BERT</option>
+		<option value = "xgboost">XGBOOST</option>
+		<option value = "lstm">LSTM</option>
+		<option value = "bert">BERT</option>
 		</select>
 		<input type = "button" name = "button" value = "submit" onclick="fileSubmit()">
 	</form>
+	<br>
 	<div id="res"></div>
 	<br>
 	<br>
 	<br>
 	<form id="uploadForm" enctype="multipart/form-data">
-		<input id="file" type="file" name="file"/>
-		<button id="upload" type="button">upload</button>
+		<input id="file" type="file"/>
+		<button  id="upload" type="button"  name="button" >upload</button>
 	</form>
 	</center>
 </body>
@@ -49,16 +55,44 @@ Input the sentence or paragraph to be analyzed
 		var data=JSON.stringify(obj);
         $.ajax({
             url: "http://127.0.0.1:8000/sentiment/",
-            data: data,
-			dataType:"json",
-			contentType: "application/json",
+            data: obj,
+			//dataType:"json",
+			//contentType: "application/json",
             type: "post",
-            success: function (data) {
-				console.log("返回参数",data);
-                alert("success");
+            success: function (res) {
+				console.log("返回参数",res);
+				document.getElementById("res").innerHTML = res
             }
         })
 		}
-		// document.getElementById("res").innerHTML = request.getParameter("res")
 	</script>
+<script>
+   $("#upload").click(function(){
+	    event.preventDefault();
+        //var formData = new FormData();
+		//const file = document.querySelector('#textfile').files[0]
+		const file = document.getElementById('file').files[0];
+    	var form = new FormData();
+    	form.append('file', file);
+	    //formData.append("myFile", $('#file')[0]);
+	    form.forEach((key, val) => {
+		console.log("key %s: value %s", key, val)
+		})
+		//console.log(formData.get(file))
+    	$.ajax({
+    	type: 'post',
+    	url: "http://127.0.0.1:8000/sentiment/", 
+     	data: form,
+     	cache: false,
+     	processData: false,
+     	contentType: false,
+      	}).success(function (data) {
+        	console.log(data);
+        	alert("上传成功"+data);
+        	filename=data;
+      	}).error(function () {
+         	alert("上传失败");
+     });
+    });
+</script>
 </html>

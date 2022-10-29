@@ -9,14 +9,13 @@ from tqdm.notebook import tqdm
 import numpy as np
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
+PRE_TRAINED_MODEL_NAME = "bert-base-cased"
 tokenizer = BertTokenizer.from_pretrained(PRE_TRAINED_MODEL_NAME)
-class_names = ['negative', 'positive']
+class_names = ["negative", "positive"]
 MAX_LEN = 32
 
 
 class SentimentClassifier(nn.Module):
-
     def __init__(self, n_classes):
         super(SentimentClassifier, self).__init__()
         self.bert = BertModel.from_pretrained(PRE_TRAINED_MODEL_NAME)
@@ -24,10 +23,7 @@ class SentimentClassifier(nn.Module):
         self.out = nn.Linear(self.bert.config.hidden_size, n_classes)
 
     def forward(self, input_ids, attention_mask):
-        outs = self.bert(
-            input_ids=input_ids,
-            attention_mask=attention_mask
-        )
+        outs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
         output = self.drop(outs["pooler_output"])
         return self.out(output)
 
@@ -72,13 +68,13 @@ def create_data_loader(df, tokenizer, MAX_LEN, batch_size):
     return DataLoader(ds, batch_size, num_workers=4)
 
 
-PATH = "best_model_state.bin"
+PATH = "./sentiment/bert/best_model_state.bin"
 model = SentimentClassifier(len(class_names)).to(device)
 model.load_state_dict(torch.load(PATH, map_location=device))
 
 
 def evalSingleSentence(sentence):
-    evaluationDF = pd.DataFrame(columns=['target', 'text', 'no'])
+    evaluationDF = pd.DataFrame(columns=["target", "text", "no"])
     evaluationDF.loc[len(evaluationDF.index)] = [0, sentence, 0]
 
     eval_data_loader = create_data_loader(evaluationDF, tokenizer, MAX_LEN, 1)
@@ -99,7 +95,7 @@ def evalFile(filepath):
     df = df.drop(0)
     df = df.dropna()
     df.reset_index(drop=True, inplace=True)
-    df['target'] = 0
+    df["target"] = 0
 
     eval_data_loader = create_data_loader(df, tokenizer, MAX_LEN, 1)
 
@@ -113,14 +109,8 @@ def evalFile(filepath):
             outputs = model(input_ids=input_ids, attention_mask=attention_mask)
             _, preds = torch.max(outputs, dim=1)
             score = preds.item()
-            no = d['no'].item()
+            no = d["no"].item()
             result[no] = score
 
-    df['target'] = result
-    df.to_csv(filepath + '_flag.csv')
-
-
-
-
-
-
+    df["target"] = result
+    df.to_csv(filepath + "_flag.csv")

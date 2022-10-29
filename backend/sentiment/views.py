@@ -1,3 +1,4 @@
+from sys import flags
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -6,7 +7,7 @@ from .lstm.lstm import predict_text
 from .lstm.lstm_file import predict_text as predict_file
 from .xgboost.xgboost_method import xgboost_evaluate, xgboost_evaluate_single
 
-# from .bert.bertapi import evalFile, evalSingleSentence
+from .bert.bertapi import evalFile, evalSingleSentence
 
 # Create your views here.
 
@@ -26,8 +27,8 @@ def eval_sentence(request):
             res = predict_text(sentence)
         elif method == "xgboost" or method == "XGBOOST":
             res = xgboost_evaluate_single(sentence)
-        # elif method == "bert":
-        #     res = evalSingleSentence(sentence)
+        elif method == "bert" or method == "BERT":
+            res = evalSingleSentence(sentence)
         print(res)
         return Response(res)
     else:
@@ -42,15 +43,19 @@ def eval_file(request):
     if request.method == "POST":
         # print(dict(request.POST))
         print(request.data)
-        filepath = request.data.get("file", "./sentiment/demo.txt")
-        method = request.data.get("method", "lstm")
-        print(filepath, method)
-        if method == "lstm" or method == "LSTM":
-            res = predict_file(filepath)
-        elif method == "xgboost" or method == "XGBOOST":
-            res = xgboost_evaluate(filepath)
-        # elif method == "bert":
-        #     res = evalFile(filepath)
+        flag = False
+        if flag:
+            filepath = request.data.get("file", "./sentiment/demo.txt")
+            method = request.data.get("method", "lstm")
+            print(filepath, method)
+            if method == "lstm" or method == "LSTM":
+                res = predict_file(filepath)
+            elif method == "xgboost" or method == "XGBOOST":
+                res = xgboost_evaluate(filepath)
+            # elif method == "bert":
+            #     res = evalFile(filepath)
+        else:
+            res = 1
         print(res)
         return Response(res)
     else:

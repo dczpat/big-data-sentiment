@@ -44,7 +44,7 @@ def eval_file(request):
     if request.method == "POST":
         # print(dict(request.POST))
         print(request.data)
-        flag = False
+        flag = True
         if flag:
             filepath = request.data.get("file", "./sentiment/demo.txt")
             method = request.data.get("method", "lstm")
@@ -53,8 +53,8 @@ def eval_file(request):
                 res = predict_file(filepath)
             elif method == "xgboost" or method == "XGBOOST":
                 res = xgboost_evaluate(filepath)
-            # elif method == "bert":
-            #     res = evalFile(filepath)
+            elif method == "bert":
+                res = evalFile(filepath)
         else:
             sleep(8)
             res = 1

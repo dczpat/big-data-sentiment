@@ -1,4 +1,5 @@
 from sys import flags
+from time import sleep
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -28,7 +29,7 @@ def eval_sentence(request):
         elif method == "xgboost" or method == "XGBOOST":
             res = xgboost_evaluate_single(sentence)
         elif method == "bert" or method == "BERT":
-            res = evalSingleSentence(sentence)
+            res = "negative" if evalSingleSentence(sentence) == 0 else "positive"
         print(res)
         return Response(res)
     else:
@@ -55,6 +56,7 @@ def eval_file(request):
             # elif method == "bert":
             #     res = evalFile(filepath)
         else:
+            sleep(8)
             res = 1
         print(res)
         return Response(res)

@@ -3,24 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>tool for sentimental analysis</title>
+
 </head>
+
+
 <body>
-	<script>
-		//var r = Response.getParameter("res")
-		//console.log(r)
-	//document.getElementById("res").innerHTML = Response.getParameter("res")
-	</script>
-	<br>
-	<br>
+	<image style="width: 200px" id="NUS" src="./NUS.png">
+	<font  color = "3366cc" text-align: center >  &emsp; &emsp;&emsp;&emsp;&emsp; &emsp;&emsp;&emsp;&emsp;&emsp; &emsp; &emsp;&emsp;  &emsp; &emsp;&emsp;&emsp;&emsp;&emsp; &emsp;&emsp;&emsp;                    CS5344/GROUP 30/&emsp;Cao Sheng,&emsp;Dong Chenzhi,&emsp;Neo Teng Wei,&emsp;Zhao Xinzhu,&emsp;Zhu Sisi</font>
+	<HR style="border:1 dashed #987cb9" width="100%" color=#987cb9 SIZE=2>
 	<br>
 	<br>
 	<br>
 	<br>
 	<center>
-    <h1><font color="3366cc">tool for sentimental analysis</font></h1>
+    <h1><font color="3366cc">Tool for sentimental analysis</font></h1>
 	<br>
-	<form name ="form1" id = "sentence" method="post">
-		<textarea name="sentence" rows="8" cols="40">
+	<form name ="form1" id = "sentence0" method="post">
+		<textarea id="sentence" rows="8" cols="40">
 Input the sentence or paragraph to be analyzed
 		</textarea>
 		<br>
@@ -39,22 +38,31 @@ Input the sentence or paragraph to be analyzed
 	<br>
 	<form id="uploadForm" enctype="multipart/form-data">
 		<input id="file" type="file"/>
+		<select name = "method2">
+			<option value = "xgboost">XGBOOST</option>
+			<option value = "lstm">LSTM</option>
+			<option value = "bert">BERT</option>
+			</select>
 		<button  id="upload" type="button"  name="button" >upload</button>
 	</form>
+	<img style="width: 900px" id="img1" src="">
 	</center>
 </body>
 <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
 <script type="text/javascript">
 		function fileSubmit(){
-		var arry = $("form").serializeArray();
+		var sentence = $("#sentence").val();
+		var method = document.getElementsByName("method")[0].value;
+		//var arry = $("form").serializeArray();
         var obj = {};
-        for (var i = 0; i < arry.length; i++) {
-            obj[arry[i].name] = arry[i].value;
+        for (var i = 0; i < 2; i++) {
+            obj['sentence'] = sentence 
+			obj['method'] = method
         }
 		console.log("传的参数：",obj);
 		var data=JSON.stringify(obj);
         $.ajax({
-            url: "http://127.0.0.1:8000/sentiment/",
+            url: "http://127.0.0.1:8000/sentiment/sentence",
             data: obj,
 			//dataType:"json",
 			//contentType: "application/json",
@@ -78,21 +86,25 @@ Input the sentence or paragraph to be analyzed
 	    form.forEach((key, val) => {
 		console.log("key %s: value %s", key, val)
 		})
-		//console.log(formData.get(file))
-    	$.ajax({
-    	type: 'post',
-    	url: "http://127.0.0.1:8000/sentiment/", 
-     	data: form,
-     	cache: false,
-     	processData: false,
-     	contentType: false,
-      	}).success(function (data) {
-        	console.log(data);
-        	alert("上传成功"+data);
-        	filename=data;
-      	}).error(function () {
-         	alert("上传失败");
-     });
-    });
+        $.ajax({
+            type: 'post',
+    		url: "http://127.0.0.1:8000/sentiment/file", 
+     		data: form,
+     		cache: false,
+     		processData: false,
+     		contentType: false,
+            success: function (data) {
+				console.log("返回参数",data);
+				document.getElementById('img1').src = "./1.png"
+				//document.getElementById('img2').src = "/Users/zhaoxinzhu/Desktop/2_.png"
+				//document.getElementById('img3').src = "/Users/zhaoxinzhu/Desktop/3_.png"
+				//document.getElementById('img4').src = "/Users/zhaoxinzhu/Desktop/4_.png"
+			// document.write("/Users/zhaoxinzhu/Desktop/1.png");
+				// document.write("/Users/zhaoxinzhu/Desktop/2.png");
+				//document.write("/Users/zhaoxinzhu/Desktop/3.png");
+				//document.write("/Users/zhaoxinzhu/Desktop/4.png");
+            }
+        })
+   })
 </script>
 </html>
